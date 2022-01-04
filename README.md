@@ -1,9 +1,6 @@
-# Flask with tensorflow object detection demo
+# Flask with Tensorflow 2 for Object Detection Demo
 
 - Frontend and backend are separated, not with common flask template. 
-
-If you are chinese, you can read one Chinese blog about this repo here.
-[几十行代码构建一个前后端分离的目标检测演示网站，代码开源](https://mp.weixin.qq.com/s/MIBNjqfx0yG-Bdq2OaeOuA)
 
 ![demo page](images/flask-object-detection.png)
 ## Server part
@@ -19,20 +16,15 @@ def main_interface():
     data_str = response['image']
     point = data_str.find(',')
     base64_str = data_str[point:]  # remove unused part like this: "data:image/jpeg;base64,"
-
-    image = base64.b64decode(base64_str)       
+    image = base64.b64decode(base64_str)
     img = Image.open(io.BytesIO(image))
-
+    # convert to rgb
     if(img.mode!='RGB'):
         img = img.convert("RGB")
-    
     # convert to numpy array.
     img_arr = np.array(img)
-
     # do object detection in inference function.
-    results = inference(sess, detection_graph, img_arr, conf_thresh=0.5)
-    print(results)
-
+    results = generate_inference(model, img_arr)
     return jsonify(results)
 ```
 
@@ -91,7 +83,7 @@ http-server
 ## Demo
 You can click the button, or drag one image to the page, then the result will show bellow.
 
-![页面效果图](images/demo.gif)
+![页面效果图](images/example.png)
 
 ## Run by Docker
 
@@ -99,16 +91,23 @@ You can click the button, or drag one image to the page, then the result will sh
 
 If you have docker installed, you can quickly test demo:
 
-`docker run -p 5000:5000 -p 8000:8000 -d vicwoo/flask-object-detection:1.0`
+`docker run -p 5000:5000 -p 8000:8000 -d capybara_object_detection`
 
 ### Docker Build：
 
 If you want to build your own docker image, you can modify the Dockerfile and execute the command:
 
-`docker build -t flask-object-detection:1.0 .`
+`docker build -t capybara_object_detection .`
 
-`docker run -p 5000:5000 -p 8000:8000 -d flask-object-detection:1.0`
+`docker run -p 5000:5000 -p 8000:8000 -d capybara_object_detection`
 
 ### Demo Results:
 
-![20200407150551](images/20200407150551.jpg)
+![image_test_1](images/test1.jpeg)
+![image_test_2](images/test2.jpeg)
+![image_test_3](images/test3.jpeg)
+![image_test_4](images/test4.jpeg)
+
+## References:
+
+- Original Code: [https://github.com/AIZOOTech/flask-object-detection](https://github.com/AIZOOTech/flask-object-detection)
